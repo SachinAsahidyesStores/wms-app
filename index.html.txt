@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WMS — Warehouse Management System under control of Stores Executive (472 Rack Locations)" />
+  <title>WMS — Warehouse Management System (472 Rack Locations)</title>
+  <style>
+    /* ==========================================================================
+       1. USER-FRIENDLY LIGHT UI THEME TOKENS & BASE RESET
+       ========================================================================== */
+    :root {
+      --bg-app: #f1f5f9;
+      --bg-panel: #ffffff;
+      --bg-card: #f8fafc;
+      --bg-input: #ffffff;
+      --bg-hover: #eff6ff;
+
+      --border: #cbd5e1;
+      --border-strong: #94a3b8;
+
+      --text-main: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+
+      --accent-cyan: #0284c7;
+      --accent-sky: #0369a1;
+      --accent-blue: #2563eb;
+
+      --emerald: #059669;
+      --emerald-bg: #ecfdf5;
+      --emerald-border: #6ee7b7;
+
+      --occ-bg: #eff6ff;
+      --occ-border: #60a5fa;
+
+      --amber: #d97706;
+      --amber-bg: #fffbeb;
+      --amber-border: #fcd34d;
+
+      --rose: #e11d48;
+      --rose-bg: #fff1f2;
+      --rose-border: #fda4af;
+
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+
+      --shadow-sm: 0 1px 4px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 18px 45px rgba(15, 23, 42, 0.24);
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: light;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      line-height: 1.45;
+      font-size: 13.5px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* ==========================================================================
+       2. USER-FRIENDLY LIGHT HEADER BANNER
+       ========================================================================== */
+    .corp-header {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-bottom: 2px solid var(--border);
+      padding: 13px 22px;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 60;
+    }
+
+    .corp-header-inner {
+      max-width: 1720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .corp-brand-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .corp-logo-box {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .corp-logo-box img {
+      max-height: 50px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .corp-divider {
+      width: 1px;
+      height: 44px;
+      background-color: var(--border);
+    }
+
+    .corp-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .corp-name-primary {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .corp-sub-line {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .corp-sub-line strong {
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    .corp-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex: 1;
+      justify-content: flex-end;
+      min-width: 300px;
+    }
+
+    .global-search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+      max-width: 390px;
+      display: flex;
+      align-items: center;
+    }
+
+    .global-search-wrap svg {
+      position: absolute;
+      left: 11px;
+      pointer-events: none;
+    }
+
+    .global-search-input {
+      width: 100%;
+      background-color: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 30px 8px 34px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .global-search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .global-search-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .global-search-clear {
+      position: absolute;
+      right: 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      display: none;
+      padding: 2px 5px;
+    }
+
+    .global-search-clear:hover {
+      color: var(--text-main);
+    }
+
+    .autosave-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background-color: #ecfdf5;
+      color: #047857;
+      border: 1px solid #6ee7b7;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .autosave-badge.offline-warn {
+      background-color: #fffbeb;
+      color: #b45309;
+      border-color: #fcd34d;
+    }
+
+    .autosave-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10b981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.65);
+    }
+
+    .autosave-badge.offline-warn .autosave-dot {
+      background-color: #f59e0b;
+      box-shadow: 0 0 6px rgba(245, 158, 11, 0.65);
+    }
+
+    /* ==========================================================================
+       3. MAIN WORKSPACE & NAVIGATION TABS
+       ========================================================================== */
+    .main-container {
+      width: 100%;
+      max-width: 1720px;
+      margin: 0 auto;
+      padding: 15px 22px 32px;
+      flex: 1;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-panel);
+      padding: 6px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover {
+      background: #eff6ff;
+      color: var(--accent-blue);
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border-color: #1d4ed8;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
+    }
+
+    .tab-badge {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-family: var(--font-mono);
+      border: 1px solid #cbd5e1;
+      font-weight: 700;
+    }
+
+    .nav-tab.active .tab-badge {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* ==========================================================================
+       4. KPI CARDS, CARDS, BUTTONS, INPUTS, BADGES & TABLES
+       ========================================================================== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 13px 16px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--accent-cyan);
+    }
+
+    .kpi-card.kpi-emp { border-left-color: var(--emerald); }
+    .kpi-card.kpi-occ { border-left-color: var(--accent-blue); }
+    .kpi-card.kpi-exp { border-left-color: var(--amber); }
+    .kpi-card.kpi-doc { border-left-color: #7c3aed; }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .kpi-value {
+      font-size: 21px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+
+    .kpi-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-body {
+      padding: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.14s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border-color: #1d4ed8;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.07);
+    }
+
+    .btn-cyan {
+      background-color: #0284c7;
+      color: #ffffff;
+      font-weight: 700;
+      border-color: #0369a1;
+    }
+
+    .btn-cyan:hover:not(:disabled) {
+      background-color: #0369a1;
+    }
+
+    .btn-success {
+      background-color: #059669;
+      color: #ffffff;
+      border-color: #047857;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background-color: #047857;
+    }
+
+    .btn-danger {
+      background-color: #e11d48;
+      color: #ffffff;
+      border-color: #be123c;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background-color: #be123c;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f1f5f9;
+      border-color: var(--border-strong);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-label .req {
+      color: #e11d48;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-main);
+      background-color: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-control:disabled,
+    .form-control[readonly] {
+      background-color: #f1f5f9;
+      color: var(--text-muted);
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 11px;
+    }
+
+    .pkg-calc-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #1d4ed8;
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .badge-empty { background: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; }
+    .badge-occupied { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+    .badge-inbound { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-transfer { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    .badge-outbound { background: #ffe4e6; color: #be123c; border: 1px solid #fda4af; }
+    .badge-direct { background: #f3e8ff; color: #7e22ce; border: 1px solid #d8b4fe; }
+    .badge-exp-warn { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+    .badge-expired { background: #ffe4e6; color: #be123c; border: 1px solid #fda4af; }
+
+    .step-number {
+      width: 23px;
+      height: 23px;
+      border-radius: 999px;
+      background: var(--accent-blue);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table.data-table th {
+      background: #f8fafc;
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-align: left;
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    table.data-table td {
+      padding: 9px 11px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+      color: var(--text-secondary);
+    }
+
+    table.data-table td strong {
+      color: var(--text-main);
+    }
+
+    table.data-table tbody tr:hover {
+      background-color: var(--bg-hover);
+    }
+
+    /* ==========================================================================
+       5. TAB 1: 472-RACK VISUAL MAP & INSPECTOR
+       ========================================================================== */
+    .map-workspace {
+      display: grid;
+      grid-template-columns: 1fr 425px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .map-filter-stack {
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .filter-pill {
+      padding: 5px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: #eff6ff;
+    }
+
+    .filter-pill.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .rack-grid-container {
+      padding: 16px;
+      max-height: 750px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #f8fafc;
+    }
+
+    .rack-line-section {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+
+    .rack-line-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .rack-line-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent-blue);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .rack-level-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .rack-level-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .rack-level-tag {
+      width: 56px;
+      flex-shrink: 0;
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      background: #f1f5f9;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 2px;
+    }
+
+    .rack-bay-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 6px;
+    }
+
+    .rack-tile {
+      border: 1px solid var(--emerald-border);
+      background-color: var(--emerald-bg);
+      border-radius: var(--radius-sm);
+      padding: 6px 5px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 62px;
+    }
+
+    .rack-tile:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+      border-color: var(--accent-blue);
+    }
+
+    .rack-tile.occupied {
+      background-color: var(--occ-bg);
+      border-color: var(--occ-border);
+      border-bottom: 3px solid var(--accent-blue);
+    }
+
+    .rack-tile.exp-warn {
+      border-bottom: 3px solid var(--amber);
+    }
+
+    .rack-tile.expired {
+      background-color: var(--rose-bg);
+      border-color: var(--rose-border);
+      border-bottom: 3px solid var(--rose);
+    }
+
+    .rack-tile.match {
+      background-color: #fffbeb;
+      box-shadow: 0 0 0 2px #f59e0b;
+      border-color: #d97706;
+    }
+
+    .rack-tile.selected {
+      outline: 2.5px solid #0f172a;
+      outline-offset: 1px;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.24);
+    }
+
+    .rack-tile-code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: #047857;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rack-tile.occupied .rack-tile-code { color: #1d4ed8; }
+    .rack-tile.expired .rack-tile-code { color: #be123c; }
+
+    .rack-tile-chem {
+      font-size: 9.5px;
+      color: #0f172a;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .rack-tile-meta {
+      font-size: 9.5px;
+      color: #059669;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .rack-tile.occupied .rack-tile-meta {
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    .inspector-panel {
+      position: sticky;
+      top: 90px;
+    }
+
+    .inspector-rename-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 9px 11px;
+      margin-bottom: 12px;
+    }
+
+    .inspector-lot-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #f8fafc;
+    }
+
+    /* ==========================================================================
+       6. WORKFLOW GRIDS
+       ========================================================================== */
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 495px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .three-step-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .selectable-lot-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.12s;
+      background: #ffffff;
+    }
+
+    .selectable-lot-item:hover {
+      border-color: var(--accent-blue);
+      background: #f8fafc;
+    }
+
+    .selectable-lot-item.selected {
+      border-color: var(--accent-blue);
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    /* ==========================================================================
+       7. PURE WHITE (#FFFFFF) A4 GRN & GDN DOCUMENT MODAL & PRINT TEMPLATE
+       ========================================================================== */
+    .doc-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
+      z-index: 150;
+    }
+
+    .doc-modal-backdrop.open {
+      display: flex;
+    }
+
+    .doc-modal-shell {
+      width: 100%;
+      max-width: 880px;
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      margin: auto;
+      border: 1px solid #cbd5e1;
+    }
+
+    .doc-modal-toolbar {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #334155;
+    }
+
+    #printableDoc.a4-sheet {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      padding: 32px 38px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      line-height: 1.45;
+      color-scheme: light;
+    }
+
+    #printableDoc * { color-scheme: light; }
+
+    .a4-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid #0B253C;
+      background: #ffffff !important;
+    }
+
+    .a4-company-block { max-width: 65%; background: #ffffff !important; }
+    .a4-company-name { font-size: 15px; font-weight: 800; color: #0B253C !important; margin-top: 7px; }
+    .a4-company-sub { font-size: 12.5px; font-weight: 700; color: #1e293b !important; }
+    .a4-company-addr { font-size: 11px; color: #334155 !important; margin-top: 2px; }
+    .a4-doc-title-block { text-align: right; background: #ffffff !important; }
+    .a4-doc-type { font-size: 32px; font-weight: 900; color: #0B253C !important; letter-spacing: 0.03em; line-height: 1.05; }
+    .a4-doc-no { font-size: 14px; font-weight: 700; color: #1e293b !important; margin-top: 4px; font-family: var(--font-mono); }
+
+    .a4-doc-banner {
+      background-color: #f1f5f9 !important;
+      border: 1px solid #cbd5e1;
+      color: #0B253C !important;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      padding: 6px 12px;
+      margin-top: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .a4-meta-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 22px;
+      margin-top: 14px;
+      margin-bottom: 18px;
+      background: #ffffff !important;
+    }
+
+    .a4-party-box {
+      flex: 1;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 10px 14px;
+      min-height: 118px;
+      background: #ffffff !important;
+    }
+
+    .a4-party-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #0B253C !important;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+    }
+
+    .a4-party-content {
+      font-size: 12px;
+      color: #0f172a !important;
+      white-space: pre-line;
+      font-weight: 600;
+    }
+
+    .a4-meta-table {
+      width: 325px;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      background: #ffffff !important;
+    }
+
+    .a4-meta-table td { border: 1px solid #cbd5e1; padding: 4.5px 10px; }
+    .a4-meta-table td:first-child { background-color: #f1f5f9 !important; font-weight: 700; color: #1e293b !important; width: 44%; }
+    .a4-meta-table td:last-child { background-color: #ffffff !important; font-weight: 700; color: #0f172a !important; }
+
+    .a4-items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 11.5px;
+      background: #ffffff !important;
+    }
+
+    .a4-items-table th {
+      background-color: #0B253C !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 9px;
+      border: 1px solid #0B253C;
+      font-size: 11px;
+    }
+
+    .a4-items-table th.num-col, .a4-items-table td.num-col { text-align: center; width: 40px; }
+    .a4-items-table th.rack-col, .a4-items-table td.rack-col { text-align: center; width: 96px; font-family: var(--font-mono); font-weight: 800; color: #0B253C !important; }
+    .a4-items-table th.pkg-col, .a4-items-table td.pkg-col { text-align: center; width: 115px; font-weight: 700; color: #0f172a !important; }
+    .a4-items-table th.qty-col, .a4-items-table td.qty-col { text-align: right; width: 120px; font-family: var(--font-mono); font-weight: 800; color: #0f172a !important; }
+
+    .a4-items-table td {
+      padding: 7px 9px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+
+    .a4-items-table tr:nth-child(even) td { background-color: #f8fafc !important; }
+    .a4-items-table tr.a4-total-row td { background-color: #f1f5f9 !important; font-weight: 800; color: #0B253C !important; border-top: 2px solid #0B253C; }
+
+    .a4-notes-box {
+      border: 1px solid #cbd5e1;
+      background: #f8fafc !important;
+      color: #0f172a !important;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 22px;
+      font-size: 11.5px;
+    }
+
+    .a4-signatures {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin-top: 36px;
+      margin-bottom: 24px;
+      text-align: center;
+      background: #ffffff !important;
+    }
+
+    .a4-sig-line {
+      border-top: 1px solid #334155;
+      padding-top: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #1e293b !important;
+    }
+
+    .a4-corp-footer {
+      border-top: 2px solid #0B253C;
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1e293b !important;
+      background: #ffffff !important;
+    }
+
+    /* ==========================================================================
+       8. LIGHT MODALS (GITHUB LOGIN, DIRECT RACK ADD & CONFIRMATION) & TOASTS
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 170;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 560px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      margin: auto;
+    }
+
+    .modal-header {
+      padding: 13px 18px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-footer {
+      padding: 12px 18px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 48px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 220;
+      max-width: 420px;
+    }
+
+    .toast {
+      background: #ffffff;
+      color: var(--text-main);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent-blue);
+    }
+
+    .toast.success { border-left-color: var(--emerald); }
+    .toast.warning { border-left-color: var(--amber); }
+    .toast.error { border-left-color: var(--rose); }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       9. PERSISTENT WEB PAGE FOOTER (COPYRIGHT BY SACHIN_SHERON)
+       ========================================================================== */
+    .app-footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      padding: 12px 22px;
+      margin-top: auto;
+      box-shadow: 0 -1px 3px rgba(15, 23, 42, 0.03);
+    }
+
+    .app-footer-inner {
+      max-width: 1720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .app-footer-copy {
+      font-weight: 800;
+      color: var(--accent-blue);
+    }
+
+    @media (max-width: 1250px) {
+      .map-workspace { grid-template-columns: 1fr; }
+      .inspector-panel { position: static; }
+      .two-col-grid { grid-template-columns: 1fr; }
+      .three-step-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .corp-divider { display: none; }
+      .rack-level-row { flex-direction: column; }
+    }
+
+    @media print {
+      html, body { background: #ffffff !important; color: #0f172a !important; }
+      body * { visibility: hidden; }
+      body.printing-doc #docModalBackdrop, body.printing-doc #docModalBackdrop * { visibility: visible; }
+      body.printing-doc #docModalBackdrop { position: absolute; left: 0; top: 0; width: 100%; background: #ffffff !important; padding: 0; margin: 0; display: block !important; }
+      body.printing-doc .doc-modal-shell { box-shadow: none; max-width: 100%; border-radius: 0; border: none; background: #ffffff !important; }
+      body.printing-doc .doc-modal-toolbar { display: none !important; }
+      body.printing-doc #printableDoc.a4-sheet { padding: 10mm 12mm; background: #ffffff !important; color: #0f172a !important; }
+      body.printing-summary #tab-reports, body.printing-summary #tab-reports * { visibility: visible; background: #ffffff !important; color: #0f172a !important; }
+      body.printing-summary #tab-reports { position: absolute; left: 0; top: 0; width: 100%; }
+      body.printing-summary .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <datalist id="chemSuggestionsList">
+    <option value="CALCIUM HYPOCHLORIDE"></option>
+    <option value="SODIUM HYPOCHLORITE"></option>
+    <option value="CITRIC ACID"></option>
+    <option value="FORMIC ACID"></option>
+    <option value="OXALIC ACID"></option>
+    <option value="CAUSTIC SODA FLAKES"></option>
+    <option value="SODA ASH LIGHT"></option>
+    <option value="HYDROGEN PEROXIDE 50%"></option>
+    <option value="ACETIC ACID GLACIAL"></option>
+    <option value="SODIUM SULPHATE ANHYDROUS"></option>
+    <option value="SODIUM METABISULPHITE"></option>
+    <option value="TITANIUM DIOXIDE"></option>
+  </datalist>
+
+  <!-- ========================================================================
+       1. USER-FRIENDLY LIGHT WEB DISPLAY HEADER BANNER
+       ======================================================================== -->
+  <header class="corp-header">
+    <div class="corp-header-inner">
+      <div class="corp-brand-left">
+        <div class="corp-logo-box" id="headerLogoContainer"></div>
+        <div class="corp-divider"></div>
+        <div class="corp-details">
+          <div class="corp-name-primary" id="hdrCompanyPrimary">WMS — Warehouse Management System</div>
+          <div class="corp-sub-line">
+            <strong id="hdrCompanySecondary">WMS under control of Stores Executive</strong>
+          </div>
+          <div class="corp-sub-line" id="hdrCompanyAddress">
+            All data copyrights by me own &bull; 472 Rack Locations
+          </div>
+        </div>
+      </div>
+
+      <div class="corp-header-right">
+        <div class="global-search-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="globalSearchInput" class="global-search-input" placeholder="Search Rack, Chemical, Lot No., Invoice, Packing List, GRN, MFG/EXP..." autocomplete="off" />
+          <button type="button" id="btnClearGlobalSearch" class="global-search-clear" title="Clear search">✕</button>
+        </div>
+
+        <div class="autosave-badge offline-warn" id="cloudStatusBadge" title="Click to configure GitHub Cloud Access & Permissions">
+          <span class="autosave-dot"></span>
+          <span id="autoSaveText">Local Mode (Click to Connect Cloud)</span>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-sm" id="btnCloudSyncNow" title="Pull latest updates from GitHub Cloud">↻ Sync Cloud</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnOpenCloudLogin" title="GitHub Permission Token & User Setup">🔑 Access</button>
+        <button type="button" class="btn btn-cyan btn-sm" id="btnHdrExportStockCsv" title="Export Full Stock CSV">📊 Export CSV</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       2. MAIN WORKSPACE & NAVIGATION TABS
+       ======================================================================== -->
+  <main class="main-container">
+    <nav class="nav-tabs" role="tablist">
+      <button type="button" class="nav-tab active" data-tab="map" role="tab">
+        <span>1. 472-Rack Map &amp; Inspector</span>
+        <span class="tab-badge" id="badgeMapOcc">0/472</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="unloading" role="tab">
+        <span>2. Unloading, Invoice / PL &amp; GRN</span>
+        <span class="tab-badge" id="badgeUnloadingStage">0</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="putaway" role="tab">
+        <span>3. Internal Putaway</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="loading" role="tab">
+        <span>4. Vehicle Loading &amp; GDN</span>
+        <span class="tab-badge" id="badgeLoadingStage">0</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="docs" role="tab">
+        <span>5. GRN &amp; GDN Archive</span>
+        <span class="tab-badge" id="badgeDocsCount">0</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="reports" role="tab">
+        <span>6. Summaries &amp; Audit Log</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="settings" role="tab">
+        <span>7. Rack Locations &amp; Backup</span>
+      </button>
+    </nav>
+
+    <!-- ======================================================================
+         TAB 1: 472-RACK MAP & INSPECTOR
+         ====================================================================== -->
+    <section id="tab-map" class="tab-panel active">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Locations</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpiTotalRacks">472</span>
+            <span class="kpi-sub">Racks 01–07 (A–D)</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-emp">
+          <div class="kpi-label">Empty Locations</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpiEmpRacks" style="color:#059669;">472</span>
+            <span class="kpi-sub">Available</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-occ">
+          <div class="kpi-label">Occupied Locations</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpiOccRacks" style="color:#2563eb;">0</span>
+            <span class="kpi-sub" id="kpiOccPct">0.0% utilized</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-exp">
+          <div class="kpi-label">Expiring (&lt;90d) / Expired</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpiExpCounts" style="color:#d97706;">0 / 0</span>
+            <span class="kpi-sub">Active lots</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-doc">
+          <div class="kpi-label">Saved White GRNs / GDNs</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpiGrnGdnCount" style="color:#7c3aed;">0 / 0</span>
+            <span class="kpi-sub" id="kpiTxnCount">0 logs</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-workspace">
+        <div class="card">
+          <div class="map-filter-stack">
+            <div class="filter-row">
+              <div class="filter-pills" id="rackLinePills">
+                <button type="button" class="filter-pill active" data-line="ALL">All 472</button>
+                <button type="button" class="filter-pill" data-line="01">Rack 01 (76)</button>
+                <button type="button" class="filter-pill" data-line="02">Rack 02 (76)</button>
+                <button type="button" class="filter-pill" data-line="03">Rack 03 (76)</button>
+                <button type="button" class="filter-pill" data-line="04">Rack 04 (76)</button>
+                <button type="button" class="filter-pill" data-line="05">Rack 05 (56)</button>
+                <button type="button" class="filter-pill" data-line="06">Rack 06 (56)</button>
+                <button type="button" class="filter-pill" data-line="07">Rack 07 (56)</button>
+              </div>
+            </div>
+
+            <div class="filter-row">
+              <div class="filter-pills" id="shelfLevelPills">
+                <button type="button" class="filter-pill active" data-level="ALL">All Levels</button>
+                <button type="button" class="filter-pill" data-level="A">Level A</button>
+                <button type="button" class="filter-pill" data-level="B">Level B</button>
+                <button type="button" class="filter-pill" data-level="C">Level C</button>
+                <button type="button" class="filter-pill" data-level="D">Level D</button>
+              </div>
+
+              <div class="filter-pills" id="mapStatusPills">
+                <button type="button" class="filter-pill active" data-status="ALL">All</button>
+                <button type="button" class="filter-pill" data-status="OCCUPIED">Occupied</button>
+                <button type="button" class="filter-pill" data-status="EMPTY">Empty</button>
+                <button type="button" class="filter-pill" data-status="EXPIRING">Expiring Soon</button>
+                <button type="button" class="filter-pill" data-status="MATCH" id="pillSearchMatches" style="display:none;">Search Matches</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="rackGridContainer" class="rack-grid-container"></div>
+        </div>
+
+        <aside class="card inspector-panel">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="mono" id="inspRackTitle" style="font-size:17px; color:var(--accent-blue);">01-A-01</span>
+              <span id="inspRackBadge" class="badge badge-empty">EMPTY</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" id="btnOpenDirectAddModal">+ Add Stock Here</button>
+          </div>
+          <div class="card-body">
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;" id="inspRackSubMeta">
+              Rack Line 01 &bull; Shelf Level A &bull; Bay 01
+            </div>
+
+            <div class="inspector-rename-box">
+              <label class="form-label" for="inspRenameInput" style="display:block; margin-bottom:5px;">Edit Rack Location Code</label>
+              <div style="display:flex; gap:6px;">
+                <input type="text" id="inspRenameInput" class="form-control mono" style="padding:6px 9px; font-weight:700;" />
+                <button type="button" class="btn btn-secondary btn-sm" id="btnInspSaveName">Save</button>
+              </div>
+            </div>
+
+            <div id="inspLotsContainer"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 2: UNLOADING, INVOICE / PACKING LIST & GRN
+         ====================================================================== -->
+    <section id="tab-unloading" class="tab-panel">
+      <div class="two-col-grid">
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><span class="step-number">1</span> Unloading, Invoice &amp; Packing List Header</div>
+            </div>
+            <div class="card-body" style="display:flex; flex-direction:column; gap:11px;">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="grnNoInput">GRN Number</label>
+                  <input type="text" id="grnNoInput" class="form-control mono" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="grnDateInput">Date</label>
+                  <input type="date" id="grnDateInput" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label class="form-label" for="grnInvoiceInput">Invoice No.</label>
+                  <input type="text" id="grnInvoiceInput" class="form-control mono" placeholder="e.g. INV-2026-410" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="grnPackingListInput">Packing List No.</label>
+                  <input type="text" id="grnPackingListInput" class="form-control mono" placeholder="e.g. PL-8820" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="grnVehicleInput">Vehicle / Container No.</label>
+                  <input type="text" id="grnVehicleInput" class="form-control mono" placeholder="e.g. WP-LB-4421" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="grnVendorInput">Supplier / Vendor Details (Optional)</label>
+                <textarea id="grnVendorInput" class="form-control" rows="2" placeholder="Supplier / Vendor Name & Details..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="grnNotesInput">Notes (Optional)</label>
+                <input type="text" id="grnNotesInput" class="form-control" placeholder="General Chemicals / Remarks..." />
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><span class="step-number">2</span> Add Chemical Item &amp; Rack Location</div>
+            </div>
+            <div class="card-body" style="display:flex; flex-direction:column; gap:11px;">
+              <div class="form-group">
+                <label class="form-label" for="inChemNameInput">Chemical Name <span class="req">*</span></label>
+                <input type="text" id="inChemNameInput" class="form-control" placeholder="Type any chemical name (e.g. CALCIUM HYPOCHLORIDE)" list="chemSuggestionsList" />
+              </div>
+
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label class="form-label" for="inLotInput">Lot / Batch No.</label>
+                  <input type="text" id="inLotInput" class="form-control mono" placeholder="e.g. LOT-2609A" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="inMfgInput">MFG Date</label>
+                  <input type="date" id="inMfgInput" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="inExpInput">EXP Date</label>
+                  <input type="date" id="inExpInput" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="inQtyInput">Quantity <span class="req">*</span></label>
+                  <input type="number" id="inQtyInput" class="form-control mono" min="0.001" step="any" placeholder="e.g. 120" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="inUnitSelect">Unit</label>
+                  <select id="inUnitSelect" class="form-control">
+                    <option value="KGS">KGS</option>
+                    <option value="LTR">LTR</option>
+                    <option value="GMS">GMS</option>
+                    <option value="ML">ML</option>
+                    <option value="MT">MT</option>
+                    <option value="PCS">PCS</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="inPkgCountInput">No. of Packages (e.g. 4)</label>
+                  <input type="number" id="inPkgCountInput" class="form-control mono" min="0" step="1" placeholder="e.g. 4" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="inPkgTypeSelect">Package Type</label>
+                  <select id="inPkgTypeSelect" class="form-control">
+                    <option value="Drums">Drums</option>
+                    <option value="Bags">Bags</option>
+                    <option value="Carboys">Carboys</option>
+                    <option value="Jerry Cans">Jerry Cans</option>
+                    <option value="Boxes">Boxes</option>
+                    <option value="Pallets">Pallets</option>
+                    <option value="IBC Tanks">IBC Tanks</option>
+                    <option value="Cylinders">Cylinders</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="inPkgCalcPreview" class="pkg-calc-pill">
+                Packaging Breakdown: Enter Qty &amp; Packages (e.g. 120 KGS by 4 Drums = 30.00 KGS / Drum)
+              </div>
+
+              <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <label class="form-label" for="inRackSelect">Target Rack Location (472 Racks) <span class="req">*</span></label>
+                  <label style="font-size:11.5px; color:var(--accent-blue); cursor:pointer; display:flex; align-items:center; gap:5px; font-weight:600;">
+                    <input type="checkbox" id="inEmptyOnlyChk" /> Empty Racks Only
+                  </label>
+                </div>
+                <input type="text" id="inRackFilterInput" class="form-control mono" style="margin-bottom:5px; padding:6px 9px; font-size:12px;" placeholder="Filter rack code (e.g. 01-A-01 or 05-B)..." />
+                <select id="inRackSelect" class="form-control mono"></select>
+              </div>
+
+              <button type="button" class="btn btn-primary" id="btnAddUnloadingLine" style="width:100%;">
+                + Add Item to Staging List
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="step-number">3</span> Staged Unloading Lines
+              <span class="badge badge-occupied" id="unloadingStageBadge">0 lines</span>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btnClearUnloadingLines">Clear Lines</button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width:40px;">No.</th>
+                    <th>Chemical &amp; Lot No.</th>
+                    <th>MFG / EXP</th>
+                    <th>Rack Location</th>
+                    <th>Packages</th>
+                    <th>Quantity</th>
+                    <th style="text-align:right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="unloadingStagingBody"></tbody>
+              </table>
+            </div>
+
+            <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="font-size:12.5px; color:var(--text-secondary);">
+                Commits all staged lines into racks, syncs to cloud, and opens the <strong style="color:var(--text-main);">Pure White A4 GRN Report</strong>.
+              </div>
+              <button type="button" class="btn btn-success" id="btnSaveAndGenerateGrn" disabled>
+                ✓ Confirm Unloading, Store in Racks &amp; Generate GRN
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 3: INTERNAL PUTAWAY (RACK-TO-RACK TRANSFER)
+         ====================================================================== -->
+    <section id="tab-putaway" class="tab-panel">
+      <div class="three-step-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="step-number">1</span> Select Source Rack</div>
+          </div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+            <div class="form-group">
+              <label class="form-label" for="paSourceFilter">Filter Occupied Racks</label>
+              <input type="text" id="paSourceFilter" class="form-control mono" placeholder="Type rack code (01-A-01), chemical, lot, invoice..." />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="paSourceSelect">Occupied Rack Location</label>
+              <select id="paSourceSelect" class="form-control mono"></select>
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:6px;">Pick Batch Inside Rack:</div>
+              <div id="paSourceLotsContainer"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="step-number">2</span> Qty &amp; Packages to Move</div>
+          </div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+            <div id="paSelectedLotSummary" style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius-md); padding:12px;">
+              <span style="color:var(--text-muted);">Select a source rack and chemical batch in Step 1.</span>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label class="form-label" for="paMoveQtyInput">Quantity to Move <span class="req">*</span></label>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnPaFullQty" disabled>Move Full Batch</button>
+              </div>
+              <input type="number" id="paMoveQtyInput" class="form-control mono" min="0.001" step="any" disabled />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="paMovePkgInput">Packages to Move (Auto-proportional, Editable)</label>
+              <input type="number" id="paMovePkgInput" class="form-control mono" min="0" step="1" disabled />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="paNoteInput">Transfer Reason / Notes (Optional)</label>
+              <input type="text" id="paNoteInput" class="form-control" placeholder="e.g. Rack consolidation / Chemical segregation" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="step-number">3</span> Destination Rack &amp; Move</div>
+          </div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label class="form-label" for="paDestFilter">Filter Destination Racks</label>
+                <label style="font-size:11.5px; color:var(--accent-blue); cursor:pointer; display:flex; align-items:center; gap:5px; font-weight:600;">
+                  <input type="checkbox" id="paEmptyOnlyChk" /> Empty Only
+                </label>
+              </div>
+              <input type="text" id="paDestFilter" class="form-control mono" placeholder="Type destination rack (e.g. 03-B-10)..." />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="paDestSelect">Destination Rack Location <span class="req">*</span></label>
+              <select id="paDestSelect" class="form-control mono"></select>
+            </div>
+
+            <div id="paDestStatusBox" style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius-md); padding:12px; font-size:12.5px;">
+              Select a destination rack location to preview status.
+            </div>
+
+            <button type="button" class="btn btn-cyan" id="btnConfirmPutaway" style="width:100%;" disabled>
+              ⇄ Move Stock to Destination Rack
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 4: VEHICLE LOADING, DISPATCH & GDN
+         ====================================================================== -->
+    <section id="tab-loading" class="tab-panel">
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-header">
+          <div class="card-title"><span class="step-number">1</span> Vehicle Loading &amp; Dispatch Header</div>
+        </div>
+        <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:12px;">
+            <div class="form-group">
+              <label class="form-label" for="gdnNoInput">GDN Number</label>
+              <input type="text" id="gdnNoInput" class="form-control mono" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gdnDateInput">Dispatch Date</label>
+              <input type="date" id="gdnDateInput" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gdnOrderInput">Customer Invoice / Order No.</label>
+              <input type="text" id="gdnOrderInput" class="form-control mono" placeholder="e.g. SO-2026-108" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gdnVehicleInput">Vehicle No.</label>
+              <input type="text" id="gdnVehicleInput" class="form-control mono" placeholder="e.g. WP-LN-7821" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gdnDriverInput">Driver Name</label>
+              <input type="text" id="gdnDriverInput" class="form-control" placeholder="e.g. Mr. K. Perera" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="gdnCustomerInput">Customer / Consignee Details</label>
+              <textarea id="gdnCustomerInput" class="form-control" rows="2" placeholder="Customer / Consignee Details..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gdnNotesInput">Dispatch Notes</label>
+              <textarea id="gdnNotesInput" class="form-control" rows="2" placeholder="Delivery instructions / remarks..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col-grid" style="grid-template-columns: 1.25fr 1fr;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="step-number">2</span> Pick Chemical from Racks (FEFO / FIFO Sorted)</div>
+          </div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+            <div class="form-group">
+              <label class="form-label" for="gdnChemSelect">Select Chemical in Warehouse Stock</label>
+              <select id="gdnChemSelect" class="form-control"></select>
+            </div>
+            <div id="gdnFifoListContainer"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="step-number">3</span> Staged Vehicle Loading Lines
+              <span class="badge badge-outbound" id="loadingStageBadge">0 lines</span>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btnClearLoadingLines">Clear Lines</button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Pick Rack</th>
+                    <th>Chemical &amp; Lot</th>
+                    <th>Packages</th>
+                    <th>Dispatch Qty</th>
+                    <th style="text-align:right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="loadingStagingBody"></tbody>
+              </table>
+            </div>
+
+            <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="font-size:12.5px; color:var(--text-secondary);">
+                Deducts stock from racks, syncs to cloud, and opens the <strong style="color:var(--text-main);">Pure White A4 GDN Report</strong>.
+              </div>
+              <button type="button" class="btn btn-danger" id="btnConfirmAndGenerateGdn" disabled>
+                ↑ Confirm Vehicle Loading &amp; Generate GDN
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 5: GRN & GDN ARCHIVE
+         ====================================================================== -->
+    <section id="tab-docs" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div class="filter-pills" id="docArchiveFilters">
+            <button type="button" class="filter-pill active" data-doc-type="ALL">All Documents</button>
+            <button type="button" class="filter-pill" data-doc-type="GRN">GRN Reports (Inbound)</button>
+            <button type="button" class="filter-pill" data-doc-type="GDN">GDN Reports (Outbound)</button>
+          </div>
+          <input type="text" id="docArchiveSearch" class="form-control" style="max-width:410px;" placeholder="Search GRN/GDN No., Invoice No., Packing List, Vendor/Customer, Chemical, Lot..." />
+        </div>
+        <div class="card-body">
+          <div class="table-responsive" id="docArchiveTableWrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 6: SUMMARIES & AUDIT LOG
+         ====================================================================== -->
+    <section id="tab-reports" class="tab-panel">
+      <div class="card">
+        <div class="card-header no-print">
+          <div class="filter-pills" id="summarySubTabs">
+            <button type="button" class="filter-pill active" data-summary="chem-stock">1. Chemical-Wise Stock Summary</button>
+            <button type="button" class="filter-pill" data-summary="inv-pl">2. Invoice &amp; Packing List Summary</button>
+            <button type="button" class="filter-pill" data-summary="rack-occ">3. Rack-Wise Occupancy Summary</button>
+            <button type="button" class="filter-pill" data-summary="audit-log">4. Complete Movement Audit Log</button>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-success btn-sm" id="btnDownloadSummaryCsv">⬇ Export CSV</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btnPrintSummary">🖨 Print Table</button>
+          </div>
+        </div>
+
+        <div id="auditFilterBar" class="map-filter-stack no-print" style="display:none;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; width:100%; align-items:center;">
+            <select id="auditTypeSelect" class="form-control" style="width:auto; padding:6px 10px;">
+              <option value="ALL">All Movement Types</option>
+              <option value="INBOUND">Unloading / GRN</option>
+              <option value="DIRECT-ADD">Direct Rack Addition</option>
+              <option value="TRANSFER">Putaway Transfer</option>
+              <option value="OUTBOUND">Vehicle Loading / GDN</option>
+            </select>
+            <input type="date" id="auditFromDate" class="form-control" style="width:auto; padding:6px 10px;" />
+            <input type="date" id="auditToDate" class="form-control" style="width:auto; padding:6px 10px;" />
+            <input type="text" id="auditKeywordInput" class="form-control" style="flex:1; min-width:220px; padding:6px 10px;" placeholder="Filter by chemical, lot, invoice, packing list, rack, GRN/GDN..." />
+            <button type="button" class="btn btn-secondary btn-sm" id="btnResetAuditFilters">Reset</button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div style="margin-bottom:14px;">
+            <h3 id="summaryHeading" style="font-size:16px; font-weight:800; color:var(--text-main);">Chemical-Wise Stock Summary</h3>
+            <p id="summarySubheading" style="font-size:12.5px; color:var(--text-muted);">Live warehouse stock balances, packaging counts, expiry status, and exact rack locations.</p>
+          </div>
+          <div class="table-responsive" id="summaryTableContainer"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 7: RACK LOCATIONS & BACKUP SETTINGS
+         ====================================================================== -->
+    <section id="tab-settings" class="tab-panel">
+      <div class="two-col-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">A. Rack Locations Manager (<span id="settingsRackCountLabel">472</span> Locations)</div>
+          </div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+            <p style="font-size:12.5px; color:var(--text-secondary);">
+              Pre-loaded with all <strong style="color:var(--text-main);">472 exact rack locations</strong> (<span class="mono">01-A-01</span> to <span class="mono">04-D-19</span> and <span class="mono">05-A-01</span> to <span class="mono">07-D-14</span>). Add new locations, remove empty ones, or bulk edit/export below:
+            </p>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="newRackCodeInput">Add New Location Code</label>
+                <input type="text" id="newRackCodeInput" class="form-control mono" placeholder="e.g. 08-A-01 or FLOOR-01" />
+              </div>
+              <div class="form-group" style="justify-content:flex-end;">
+                <button type="button" class="btn btn-primary" id="btnAddNewRackLocation">+ Add Location</button>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="removeRackSelect">Remove Empty Location</label>
+                <select id="removeRackSelect" class="form-control mono"></select>
+              </div>
+              <div class="form-group" style="justify-content:flex-end;">
+                <button type="button" class="btn btn-danger" id="btnRemoveRackLocation">Remove Selected</button>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid var(--border);" />
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label class="form-label" for="bulkRackTextarea">Bulk Edit All Rack Codes (One per line)</label>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnLoadCurrentRacksToBox" style="padding:2px 8px; font-size:11px;">Load Current List</button>
+              </div>
+              <textarea id="bulkRackTextarea" class="form-control mono" rows="7" placeholder="01-A-01&#10;01-A-02&#10;..."></textarea>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-cyan btn-sm" id="btnApplyBulkRacks">Apply Custom Rack List</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnExportRackCsv">⬇ Export Rack List CSV</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnResetDefault472Racks">Reset to Default 472 Racks</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">B. GitHub Cloud Sync &amp; Co-Worker Access</div>
+            </div>
+            <div class="card-body" style="display:flex; flex-direction:column; gap:11px;">
+              <p style="font-size:12.5px; color:var(--text-secondary);">
+                Every change automatically commits <span class="mono">wms_database.json</span> and <span class="mono">WMS_Live_Stock.csv</span> to your private GitHub repository so co-workers share live stock and both laptops auto-download physical backups.
+              </p>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-primary" id="btnSettingsCloudSetup">🔑 Configure GitHub Access Token</button>
+                <button type="button" class="btn btn-secondary" id="btnSettingsForcePush">⬆ Force Push to Cloud</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">C. Manual PC Backup, Restore &amp; Sample Data</div>
+            </div>
+            <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-cyan" id="btnDownloadJsonBackup">⬇ Download Backup (.json)</button>
+                <button type="button" class="btn btn-secondary" id="btnUploadJsonBackup">⬆ Restore (.json)</button>
+                <input type="file" id="restoreJsonFileInput" accept=".json,application/json" style="display:none;" />
+              </div>
+
+              <hr style="border:none; border-top:1px solid var(--border);" />
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnLoadSampleData">Load Sample Stock (e.g. 120 KGS by 4 Drums)</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnResetDatabase">Clear Inventory &amp; Logs</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       PERSISTENT WEB PAGE FOOTER (COPYRIGHT BY SACHIN_SHERON)
+       ======================================================================== -->
+  <footer class="app-footer">
+    <div class="app-footer-inner">
+      <div>
+        <strong>WMS under control of Stores Executive</strong> &bull; All data copyrights by me own
+      </div>
+      <div class="app-footer-copy">
+        Copyright by Sachin_Sheron
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       GITHUB CLOUD ACCESS & CO-WORKER LOGIN MODAL
+       ======================================================================== -->
+  <div id="cloudLoginModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width:520px;">
+      <div class="modal-header">
+        <strong style="font-size:15px;">🔑 Connect to Private Warehouse Cloud (GitHub)</strong>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnCloseCloudLogin">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
+          Enter your GitHub repository details and Personal Access Token. Only authorized collaborators with a valid token for your private repository can view or update warehouse stock.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="ghUserNameInput">Operator Name (Shown in Movement Logs)</label>
+          <input type="text" id="ghUserNameInput" class="form-control" placeholder="e.g. Stores Executive / Co-worker Name" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="ghOwnerInput">GitHub Owner Username <span class="req">*</span></label>
+            <input type="text" id="ghOwnerInput" class="form-control mono" placeholder="e.g. SachinSheron" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ghRepoInput">Private Data Repo Name <span class="req">*</span></label>
+            <input type="text" id="ghRepoInput" class="form-control mono" value="wms-warehouse-data" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ghTokenInput">GitHub Fine-Grained Access Token <span class="req">*</span></label>
+          <input type="password" id="ghTokenInput" class="form-control mono" placeholder="github_pat_..." />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm" id="btnDisconnectCloud" style="margin-right:auto;">Disconnect</button>
+        <button type="button" class="btn btn-secondary" id="btnCancelCloudLogin">Cancel</button>
+        <button type="button" class="btn btn-success" id="btnConnectCloudNow">✓ Connect &amp; Sync Warehouse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       DIRECT RACK QUICK-ADD MODAL
+       ======================================================================== -->
+  <div id="directAddModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <strong style="font-size:15px;">+ Add Stock Into Rack <span id="daRackCodeLabel" class="mono" style="color:var(--accent-blue);">01-A-01</span></strong>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnCloseDirectAdd">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="daChemNameInput">Chemical Name <span class="req">*</span></label>
+          <input type="text" id="daChemNameInput" class="form-control" placeholder="Type any chemical name..." list="chemSuggestionsList" />
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label" for="daLotInput">Lot / Batch No.</label>
+            <input type="text" id="daLotInput" class="form-control mono" placeholder="e.g. LOT-2609A" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="daMfgInput">MFG Date</label>
+            <input type="date" id="daMfgInput" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="daExpInput">EXP Date</label>
+            <input type="date" id="daExpInput" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="daQtyInput">Quantity <span class="req">*</span></label>
+            <input type="number" id="daQtyInput" class="form-control mono" min="0.001" step="any" placeholder="e.g. 120" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="daUnitSelect">Unit</label>
+            <select id="daUnitSelect" class="form-control">
+              <option value="KGS">KGS</option>
+              <option value="LTR">LTR</option>
+              <option value="GMS">GMS</option>
+              <option value="ML">ML</option>
+              <option value="MT">MT</option>
+              <option value="PCS">PCS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="daPkgCountInput">No. of Packages (e.g. 4)</label>
+            <input type="number" id="daPkgCountInput" class="form-control mono" min="0" step="1" placeholder="e.g. 4" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="daPkgTypeSelect">Package Type</label>
+            <select id="daPkgTypeSelect" class="form-control">
+              <option value="Drums">Drums</option>
+              <option value="Bags">Bags</option>
+              <option value="Carboys">Carboys</option>
+              <option value="Jerry Cans">Jerry Cans</option>
+              <option value="Boxes">Boxes</option>
+              <option value="Pallets">Pallets</option>
+              <option value="IBC Tanks">IBC Tanks</option>
+              <option value="Cylinders">Cylinders</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="daPkgCalcPreview" class="pkg-calc-pill">
+          Packaging Breakdown: Enter Qty &amp; Packages (e.g. 120 KGS by 4 Drums = 30.00 KGS / Drum)
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="daInvoiceInput">Invoice No.</label>
+            <input type="text" id="daInvoiceInput" class="form-control mono" placeholder="e.g. INV-2026-410" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="daPackingListInput">Packing List No.</label>
+            <input type="text" id="daPackingListInput" class="form-control mono" placeholder="e.g. PL-8820" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="daVendorInput">Supplier / Vendor (Optional)</label>
+          <input type="text" id="daVendorInput" class="form-control" placeholder="Supplier / Vendor Name" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelDirectAdd">Cancel</button>
+        <button type="button" class="btn btn-cyan" id="btnSaveDirectOnly">Save Directly to Rack</button>
+        <button type="button" class="btn btn-success" id="btnSaveDirectAndGrn">Save &amp; Generate White GRN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       PURE WHITE (#FFFFFF) A4 GRN & GDN DOCUMENT MODAL
+       ======================================================================== -->
+  <div id="docModalBackdrop" class="doc-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="doc-modal-shell">
+      <div class="doc-modal-toolbar">
+        <strong id="docModalToolbarTitle" style="font-size:14.5px;">Official White A4 Document</strong>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-success btn-sm" id="btnPrintDocument">🖨 Print / Save White PDF</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnCloseDocModal">✕ Close</button>
+        </div>
+      </div>
+      <div id="printableDoc" class="a4-sheet"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       CONFIRMATION MODAL
+       ======================================================================== -->
+  <div id="confirmModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width:450px;">
+      <div class="modal-header">
+        <strong id="confirmTitle" style="font-size:15px;">Confirm Action</strong>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnConfirmClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage" style="font-size:13.5px; color:var(--text-secondary); line-height:1.5;"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnConfirmCancel">Cancel</button>
+        <button type="button" class="btn btn-cyan" id="btnConfirmOk">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- ========================================================================
+       OFFLINE + GITHUB CLOUD MULTI-USER SYNC ENGINE
+       ======================================================================== -->
+  <script>
+    (function () {
+      "use strict";
+
+      const LS_KEY = "wms_warehouse_state_v4";
+      const GH_CFG_KEY = "wms_github_cloud_cfg_v1";
+      const IDB_NAME = "WMS_Warehouse_DB";
+      const IDB_STORE = "wms_snapshots";
+      const IDB_KEY = "active_warehouse";
+
+      const DEFAULT_TITLE = "WMS — Warehouse Management System";
+      const DEFAULT_CONTROL = "WMS under control of Stores Executive";
+      const DEFAULT_COPYRIGHT = "All data copyrights by me own";
+
+      let ghConfig = {
+        operatorName: "Stores Executive",
+        owner: "",
+        repo: "wms-warehouse-data",
+        token: "",
+        dbSha: null,
+        csvSha: null
+      };
+
+      let isCloudSyncing = false;
+      let pendingCloudPush = false;
+
+      function buildDefaultExcel472Racks() {
+        const list = [];
+        const levels = ["A", "B", "C", "D"];
+        for (let r = 1; r <= 7; r++) {
+          const line = String(r).padStart(2, "0");
+          const maxBays = r <= 4 ? 19 : 14;
+          for (const lvl of levels) {
+            for (let b = 1; b <= maxBays; b++) {
+              list.push(`${line}-${lvl}-${String(b).padStart(2, "0")}`);
+            }
+          }
+        }
+        return list;
+      }
+
+      function getWmsLogoSvg(heightPx = 48) {
+        return `
+          <svg height="${heightPx}" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WMS Warehouse Emblem">
+            <rect x="4" y="4" width="80" height="80" rx="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="2.5"/>
+            <path d="M18 34 L44 19 L70 34" fill="none" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="23" y="38" width="42" height="32" rx="4" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+            <line x1="23" y1="49" x2="65" y2="49" stroke="#2563eb" stroke-width="2.2"/>
+            <line x1="23" y1="60" x2="65" y2="60" stroke="#2563eb" stroke-width="2.2"/>
+            <line x1="44" y1="38" x2="44" y2="70" stroke="#2563eb" stroke-width="2.2"/>
+            <rect x="27" y="41" width="13" height="6" rx="1.5" fill="#10b981"/>
+            <rect x="48" y="41" width="13" height="6" rx="1.5" fill="#3b82f6"/>
+            <rect x="27" y="52" width="13" height="6" rx="1.5" fill="#3b82f6"/>
+            <rect x="48" y="52" width="13" height="6" rx="1.5" fill="#f59e0b"/>
+            <rect x="27" y="62.5" width="13" height="5.5" rx="1.5" fill="#10b981"/>
+            <rect x="48" y="62.5" width="13" height="5.5" rx="1.5" fill="#10b981"/>
+          </svg>
+        `;
+      }
+
+      let state = {
+        lastSavedAt: 0,
+        lastUpdatedBy: "Stores Executive",
+        company: {
+          primaryName: DEFAULT_TITLE,
+          secondaryName: DEFAULT_CONTROL,
+          address: DEFAULT_COPYRIGHT
+        },
+        counters: {
+          nextGrnSeq: 38,
+          nextGdnSeq: 1
+        },
+        racks: buildDefaultExcel472Racks(),
+        inventory: [],
+        grnArchive: [],
+        gdnArchive: [],
+        transactions: []
+      };
+
+      let ui = {
+        activeTab: "map",
+        selectedRackCode: "01-A-01",
+        filterRackLine: "ALL",
+        filterShelfLevel: "ALL",
+        filterStatus: "ALL",
+        searchQuery: "",
+        unloadingStaging: [],
+        paSelectedLotId: null,
+        loadingStaging: [],
+        docArchiveFilter: "ALL",
+        summaryView: "chem-stock"
+      };
+
+      let confirmHandler = null;
+
+      /* ----------------------------------------------------------------------
+         UTF-8 SAFE BASE64 HELPERS FOR GITHUB API
+         ---------------------------------------------------------------------- */
+      function utf8ToBase64(str) {
+        const bytes = new TextEncoder().encode(str);
+        let bin = "";
+        for (let i = 0; i < bytes.length; i++) {
+          bin += String.fromCharCode(bytes[i]);
+        }
+        return btoa(bin);
+      }
+
+      function base64ToUtf8(b64) {
+        const clean = b64.replace(/\s/g, "");
+        const bin = atob(clean);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) {
+          bytes[i] = bin.charCodeAt(i);
+        }
+        return new TextDecoder().decode(bytes);
+      }
+
+      /* ----------------------------------------------------------------------
+         GITHUB CLOUD SYNC ENGINE (wms_database.json + WMS_Live_Stock.csv)
+         ---------------------------------------------------------------------- */
+      function loadGhConfig() {
+        try {
+          const raw = localStorage.getItem(GH_CFG_KEY);
+          if (raw) {
+            ghConfig = Object.assign(ghConfig, JSON.parse(raw));
+          }
+        } catch (e) {}
+      }
+
+      function saveGhConfig() {
+        try {
+          localStorage.setItem(GH_CFG_KEY, JSON.stringify(ghConfig));
+        } catch (e) {}
+      }
+
+      function isCloudConfigured() {
+        return Boolean(ghConfig.owner && ghConfig.repo && ghConfig.token);
+      }
+
+      function updateCloudBadge(statusType, text) {
+        const badge = document.getElementById("cloudStatusBadge");
+        const label = document.getElementById("autoSaveText");
+        if (!badge || !label) return;
+        badge.classList.toggle("offline-warn", statusType !== "ok");
+        label.textContent = text;
+      }
+
+      async function ghApiFetch(path, options = {}) {
+        const url = `https://api.github.com/repos/${encodeURIComponent(ghConfig.owner)}/${encodeURIComponent(ghConfig.repo)}/contents/${path}`;
+        const headers = Object.assign({
+          "Authorization": `Bearer ${ghConfig.token}`,
+          "Accept": "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28"
+        }, options.headers || {});
+        return fetch(url, { ...options, headers, cache: "no-store" });
+      }
+
+      async function pullFromGitHubCloud(silent = false) {
+        if (!isCloudConfigured()) {
+          updateCloudBadge("warn", "Local Mode (Click to Connect Cloud)");
+          return false;
+        }
+        if (isCloudSyncing) return false;
+        isCloudSyncing = true;
+        if (!silent) updateCloudBadge("warn", "Syncing from Cloud...");
+
+        try {
+          const res = await ghApiFetch("wms_database.json");
+          if (res.status === 404) {
+            // Private repo has no database file yet — initialize it now
+            ghConfig.dbSha = null;
+            saveGhConfig();
+            isCloudSyncing = false;
+            await pushToGitHubCloud(true);
+            if (!silent) showToast("Connected! Created initial database in private repo.", "success");
+            return true;
+          }
+          if (!res.ok) {
+            throw new Error(`GitHub Access Error (${res.status}). Check Token & Collaborator Permission.`);
+          }
+
+          const data = await res.json();
+          const remoteChanged = data.sha !== ghConfig.dbSha;
+          ghConfig.dbSha = data.sha;
+          saveGhConfig();
+
+          if (remoteChanged && data.content) {
+            const parsed = JSON.parse(base64ToUtf8(data.content));
+            normalizeLoadedState(parsed);
+            await saveLocalOnly();
+            refreshAllViews();
+            if (silent) {
+              showToast(`Synced latest update by ${state.lastUpdatedBy || "Co-worker"}`, "info");
+            }
+          }
+
+          const t = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          updateCloudBadge("ok", `Cloud Synced (${t})`);
+          if (!silent) showToast("Warehouse synced with GitHub Cloud!", "success");
+          return true;
+        } catch (err) {
+          updateCloudBadge("warn", "Offline / Sync Error — Saved Locally");
+          if (!silent) showToast(err.message || "Could not connect to GitHub Cloud.", "error");
+          return false;
+        } finally {
+          isCloudSyncing = false;
+        }
+      }
+
+      function buildLiveStockCsvString() {
+        const active = state.inventory.filter(i => i.qty > 0).slice().sort((a, b) => a.rackCode.localeCompare(b.rackCode));
+        const headers = ["Rack Location", "Chemical Name", "Lot No", "MFG Date", "EXP Date", "Quantity", "Unit", "Packages", "Package Type", "Invoice No", "Packing List No", "GRN No"];
+        const esc = (v) => {
+          const s = v === null || v === undefined ? "" : String(v);
+          return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        };
+        const rows = active.map(r => [r.rackCode, r.chemName, r.lotNo, r.mfgDate, r.expDate, r.qty, r.unit, r.pkgCount, r.pkgType, r.invoiceNo, r.packingListNo, r.grnNo]);
+        return "\uFEFF" + [headers.map(esc).join(","), ...rows.map(r => r.map(esc).join(","))].join("\r\n");
+      }
+
+      async function pushSingleFileToGitHub(filePath, contentStr, knownSha, commitMsg) {
+        let shaToUse = knownSha;
+        if (!shaToUse) {
+          const check = await ghApiFetch(filePath);
+          if (check.ok) {
+            const meta = await check.json();
+            shaToUse = meta.sha;
+          }
+        }
+
+        const body = {
+          message: commitMsg,
+          content: utf8ToBase64(contentStr)
+        };
+        if (shaToUse) body.sha = shaToUse;
+
+        let res = await ghApiFetch(filePath, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        // Auto-retry once on 409 SHA conflict
+        if (res.status === 409) {
+          const latest = await ghApiFetch(filePath);
+          if (latest.ok) {
+            const meta = await latest.json();
+            body.sha = meta.sha;
+            res = await ghApiFetch(filePath, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body)
+            });
+          }
+        }
+
+        if (!res.ok) {
+          throw new Error(`Cloud save failed (${res.status})`);
+        }
+        const saved = await res.json();
+        return saved.content ? saved.content.sha : null;
+      }
+
+      async function pushToGitHubCloud(isInit = false) {
+        if (!isCloudConfigured()) {
+          updateCloudBadge("warn", "Local Mode (Click to Connect Cloud)");
+          return;
+        }
+        if (isCloudSyncing) {
+          pendingCloudPush = true;
+          return;
+        }
+        isCloudSyncing = true;
+        updateCloudBadge("warn", "Saving to Cloud...");
+
+        try {
+          const who = ghConfig.operatorName || "Stores Executive";
+          state.lastUpdatedBy = who;
+          const msg = isInit ? `Initialize WMS database (${who})` : `Update warehouse stock & logs (${who})`;
+
+          const newDbSha = await pushSingleFileToGitHub(
+            "wms_database.json",
+            JSON.stringify(state, null, 2),
+            ghConfig.dbSha,
+            msg
+          );
+          if (newDbSha) ghConfig.dbSha = newDbSha;
+
+          const newCsvSha = await pushSingleFileToGitHub(
+            "WMS_Live_Stock.csv",
+            buildLiveStockCsvString(),
+            ghConfig.csvSha,
+            `Update live stock CSV (${who})`
+          );
+          if (newCsvSha) ghConfig.csvSha = newCsvSha;
+
+          saveGhConfig();
+          const t = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          updateCloudBadge("ok", `Cloud Saved (${t})`);
+        } catch (err) {
+          updateCloudBadge("warn", "Saved Locally — Retry Sync When Online");
+          showToast("Saved on laptop; cloud sync will retry when online.", "warning");
+        } finally {
+          isCloudSyncing = false;
+          if (pendingCloudPush) {
+            pendingCloudPush = false;
+            pushToGitHubCloud(false);
+          }
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         LOCAL INDEXEDDB + LOCALSTORAGE ENGINE
+         ---------------------------------------------------------------------- */
+      function openIdb() {
+        return new Promise((resolve, reject) => {
+          if (!window.indexedDB) {
+            reject(new Error("IndexedDB unavailable"));
+            return;
+          }
+          const req = indexedDB.open(IDB_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) {
+              db.createObjectStore(IDB_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function saveToIdb(snapshot) {
+        try {
+          const db = await openIdb();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, "readwrite");
+            tx.objectStore(IDB_STORE).put(snapshot, IDB_KEY);
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = () => reject(tx.error);
+          });
+        } catch (err) {
+          return false;
+        }
+      }
+
+      async function loadFromIdb() {
+        try {
+          const db = await openIdb();
+          return new Promise((resolve) => {
+            const tx = db.transaction(IDB_STORE, "readonly");
+            const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+          });
+        } catch (err) {
+          return null;
+        }
+      }
+
+      async function saveLocalOnly() {
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(state));
+        } catch (e) {}
+        await saveToIdb(state);
+      }
+
+      function persistState() {
+        state.lastSavedAt = Date.now();
+        saveLocalOnly();
+        pushToGitHubCloud(false);
+      }
+
+      function normalizeLoadedState(raw) {
+        if (!raw || typeof raw !== "object") return;
+        state.lastSavedAt = raw.lastSavedAt || Date.now();
+        state.lastUpdatedBy = raw.lastUpdatedBy || "Stores Executive";
+        state.company = {
+          primaryName: DEFAULT_TITLE,
+          secondaryName: DEFAULT_CONTROL,
+          address: DEFAULT_COPYRIGHT
+        };
+        state.counters = Object.assign(state.counters, raw.counters || {});
+
+        if (Array.isArray(raw.racks) && raw.racks.length > 0) {
+          state.racks = raw.racks.map(r => (typeof r === "string" ? r.trim() : String(r.name || r).trim())).filter(Boolean);
+        } else {
+          state.racks = buildDefaultExcel472Racks();
+        }
+
+        state.inventory = Array.isArray(raw.inventory) ? raw.inventory : [];
+        state.grnArchive = Array.isArray(raw.grnArchive) ? raw.grnArchive : [];
+        state.gdnArchive = Array.isArray(raw.gdnArchive) ? raw.gdnArchive : [];
+        state.transactions = Array.isArray(raw.transactions) ? raw.transactions : [];
+
+        if (!state.racks.includes(ui.selectedRackCode) && state.racks.length > 0) {
+          ui.selectedRackCode = state.racks[0];
+        }
+      }
+
+      async function initializeStorage() {
+        loadGhConfig();
+
+        let lsData = null;
+        try {
+          const raw = localStorage.getItem(LS_KEY);
+          if (raw) lsData = JSON.parse(raw);
+        } catch (e) {}
+
+        const idbData = await loadFromIdb();
+
+        if (idbData && lsData) {
+          normalizeLoadedState((idbData.lastSavedAt || 0) >= (lsData.lastSavedAt || 0) ? idbData : lsData);
+        } else if (idbData) {
+          normalizeLoadedState(idbData);
+        } else if (lsData) {
+          normalizeLoadedState(lsData);
+        }
+
+        await saveLocalOnly();
+
+        if (isCloudConfigured()) {
+          await pullFromGitHubCloud(false);
+        } else {
+          updateCloudBadge("warn", "Local Mode (Click to Connect Cloud)");
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         FORMATTING, EXPIRY & PACKAGING HELPERS
+         ---------------------------------------------------------------------- */
+      function todayISO() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      function formatDisplayDate(isoStr) {
+        if (!isoStr || isoStr === "-") return "-";
+        const parts = isoStr.split("-");
+        if (parts.length !== 3) return isoStr;
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        return `${parts[2]} ${months[mIdx] || parts[1]} ${parts[0]}`;
+      }
+
+      function formatDocNo(prefix, seq) {
+        return `${prefix}-${String(seq).padStart(5, "0")}`;
+      }
+
+      function formatQty(num, forceTwoDecimals = false) {
+        const n = Number(num);
+        if (Number.isNaN(n)) return "0.00";
+        if (forceTwoDecimals) {
+          return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        return Number.isInteger(n) ? n.toLocaleString() : n.toLocaleString(undefined, { maximumFractionDigits: 3 });
+      }
+
+      function formatPkgString(pkgCount, pkgType) {
+        const cnt = Number(pkgCount || 0);
+        if (cnt <= 0) return "-";
+        return `${cnt} ${pkgType || "Drums"}`;
+      }
+
+      function formatQtyWithPkg(qty, unit, pkgCount, pkgType, forceDecimals = false) {
+        const qStr = `${formatQty(qty, forceDecimals)} ${unit || "KGS"}`;
+        const cnt = Number(pkgCount || 0);
+        if (cnt > 0) {
+          return `${qStr} (${cnt} ${pkgType || "Drums"})`;
+        }
+        return qStr;
+      }
+
+      function updatePkgBreakdownPill(qtyId, pkgCntId, unitId, pkgTypeId, pillId) {
+        const qty = parseFloat(document.getElementById(qtyId).value);
+        const cnt = parseInt(document.getElementById(pkgCntId).value, 10);
+        const unit = document.getElementById(unitId).value;
+        const pkgType = document.getElementById(pkgTypeId).value;
+        const pill = document.getElementById(pillId);
+
+        if (!Number.isNaN(qty) && qty > 0 && !Number.isNaN(cnt) && cnt > 0) {
+          const perPkg = (qty / cnt).toFixed(2);
+          const singular = pkgType.endsWith("s") ? pkgType.slice(0, -1) : pkgType;
+          pill.textContent = `✓ ${formatQty(qty)} ${unit} by ${cnt} ${pkgType} = ${perPkg} ${unit} / ${singular}`;
+        } else if (!Number.isNaN(qty) && qty > 0) {
+          pill.textContent = `Qty: ${formatQty(qty)} ${unit} (Bulk / Unpacked — enter packages if packed in Drums/Bags)`;
+        } else {
+          pill.textContent = `Packaging Breakdown: Enter Qty & Packages (e.g. 120 KGS by 4 Drums = 30.00 KGS / Drum)`;
+        }
+      }
+
+      function getExpiryInfo(expDateStr) {
+        if (!expDateStr || expDateStr === "-") return { status: "NONE", daysLeft: Infinity, badgeHtml: "" };
+        const today = new Date(todayISO() + "T00:00:00");
+        const exp = new Date(expDateStr + "T00:00:00");
+        if (Number.isNaN(exp.getTime())) return { status: "NONE", daysLeft: Infinity, badgeHtml: "" };
+        const diffDays = Math.floor((exp.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays < 0) {
+          return { status: "EXPIRED", daysLeft: diffDays, badgeHtml: `<span class="badge badge-expired">EXPIRED (${Math.abs(diffDays)}d ago)</span>` };
+        }
+        if (diffDays <= 90) {
+          return { status: "WARN", daysLeft: diffDays, badgeHtml: `<span class="badge badge-exp-warn">EXP IN ${diffDays}d</span>` };
+        }
+        return { status: "VALID", daysLeft: diffDays, badgeHtml: `<span class="badge badge-empty">VALID</span>` };
+      }
+
+      function generateId(prefix) {
+        return `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      }
+
+      function escapeHtml(val) {
+        if (val === null || val === undefined) return "";
+        return String(val)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function showToast(msg, type = "info") {
+        const container = document.getElementById("toastContainer");
+        const div = document.createElement("div");
+        div.className = `toast ${type}`;
+        div.textContent = msg;
+        container.appendChild(div);
+        setTimeout(() => {
+          div.style.opacity = "0";
+          div.style.transition = "opacity 0.25s";
+          setTimeout(() => div.remove(), 260);
+        }, 3600);
+      }
+
+      function openConfirm({ title, message, okText = "Confirm", danger = false, onOk }) {
+        document.getElementById("confirmTitle").textContent = title;
+        document.getElementById("confirmMessage").textContent = message;
+        const btn = document.getElementById("btnConfirmOk");
+        btn.textContent = okText;
+        btn.className = danger ? "btn btn-danger" : "btn btn-cyan";
+        confirmHandler = onOk;
+        document.getElementById("confirmModalBackdrop").classList.add("open");
+      }
+
+      function closeConfirm() {
+        document.getElementById("confirmModalBackdrop").classList.remove("open");
+        confirmHandler = null;
+      }
+
+      function getLotsInRack(rackCode) {
+        return state.inventory.filter(i => i.rackCode === rackCode && i.qty > 0);
+      }
+
+      function getOccupiedRacksSet() {
+        const s = new Set();
+        state.inventory.forEach(i => {
+          if (i.qty > 0) s.add(i.rackCode);
+        });
+        return s;
+      }
+
+      function parseRackParts(code) {
+        const m = String(code).match(/^(\d{2})-([A-D])-(\d{2})$/i);
+        if (m) return { line: m[1], level: m[2].toUpperCase(), bay: m[3] };
+        return { line: "OTHER", level: "OTHER", bay: code };
+      }
+
+      /* ----------------------------------------------------------------------
+         HEADER & KPI REFRESH
+         ---------------------------------------------------------------------- */
+      function renderHeaderAndKpis() {
+        document.getElementById("headerLogoContainer").innerHTML = getWmsLogoSvg(48);
+        document.getElementById("hdrCompanyPrimary").textContent = DEFAULT_TITLE;
+        document.getElementById("hdrCompanySecondary").textContent = DEFAULT_CONTROL;
+        document.getElementById("hdrCompanyAddress").textContent = `${DEFAULT_COPYRIGHT} • ${state.racks.length} Rack Locations`;
+
+        const totalRacks = state.racks.length;
+        const occSet = getOccupiedRacksSet();
+        const occCount = occSet.size;
+        const empCount = Math.max(0, totalRacks - occCount);
+        const pct = totalRacks > 0 ? ((occCount / totalRacks) * 100).toFixed(1) : "0.0";
+
+        let warnCount = 0;
+        let expiredCount = 0;
+        state.inventory.forEach(lot => {
+          if (lot.qty <= 0) return;
+          const exp = getExpiryInfo(lot.expDate);
+          if (exp.status === "WARN") warnCount++;
+          if (exp.status === "EXPIRED") expiredCount++;
+        });
+
+        document.getElementById("kpiTotalRacks").textContent = totalRacks;
+        document.getElementById("kpiEmpRacks").textContent = empCount;
+        document.getElementById("kpiOccRacks").textContent = occCount;
+        document.getElementById("kpiOccPct").textContent = `${pct}% utilized`;
+        document.getElementById("kpiExpCounts").textContent = `${warnCount} / ${expiredCount}`;
+        document.getElementById("kpiGrnGdnCount").textContent = `${state.grnArchive.length} / ${state.gdnArchive.length}`;
+        document.getElementById("kpiTxnCount").textContent = `${state.transactions.length} logs`;
+
+        document.getElementById("badgeMapOcc").textContent = `${occCount}/${totalRacks}`;
+        document.getElementById("badgeUnloadingStage").textContent = ui.unloadingStaging.length;
+        document.getElementById("badgeLoadingStage").textContent = ui.loadingStaging.length;
+        document.getElementById("badgeDocsCount").textContent = state.grnArchive.length + state.gdnArchive.length;
+      }
+
+      /* ----------------------------------------------------------------------
+         TAB 1: 472-RACK VISUAL MAP & INSPECTOR
+         ---------------------------------------------------------------------- */
+      function getSearchMatchedRacks(query) {
+        const q = query.trim().toLowerCase();
+        if (!q) return new Set();
+        const matches = new Set();
+
+        state.racks.forEach(code => {
+          if (code.toLowerCase().includes(q)) matches.add(code);
+        });
+
+        state.inventory.forEach(item => {
+          if (item.qty <= 0) return;
+          const hay = `${item.rackCode} ${item.chemName} ${item.lotNo} ${item.invoiceNo} ${item.packingListNo} ${item.grnNo} ${item.mfgDate} ${item.expDate} ${item.pkgType} ${item.vendor}`.toLowerCase();
+          if (hay.includes(q)) matches.add(item.rackCode);
+        });
+
+        return matches;
+      }
+
+      function renderRackGrid() {
+        const container = document.getElementById("rackGridContainer");
+        const occSet = getOccupiedRacksSet();
+        const matchSet = getSearchMatchedRacks(ui.searchQuery);
+
+        const clearBtn = document.getElementById("btnClearGlobalSearch");
+        const matchPill = document.getElementById("pillSearchMatches");
+
+        if (ui.searchQuery.trim()) {
+          clearBtn.style.display = "inline-block";
+          matchPill.style.display = "inline-block";
+          matchPill.textContent = `Search Matches (${matchSet.size})`;
+        } else {
+          clearBtn.style.display = "none";
+          matchPill.style.display = "none";
+          if (ui.filterStatus === "MATCH") {
+            ui.filterStatus = "ALL";
+            document.querySelectorAll("#mapStatusPills .filter-pill").forEach(p => {
+              p.classList.toggle("active", p.getAttribute("data-status") === "ALL");
+            });
+          }
+        }
+
+        const grouped = new Map();
+        state.racks.forEach(code => {
+          const isOcc = occSet.has(code);
+          const isMatch = matchSet.has(code);
+          const parts = parseRackParts(code);
+          const lots = isOcc ? getLotsInRack(code) : [];
+
+          let hasExpWarn = false;
+          let hasExpired = false;
+          lots.forEach(l => {
+            const e = getExpiryInfo(l.expDate);
+            if (e.status === "WARN") hasExpWarn = true;
+            if (e.status === "EXPIRED") hasExpired = true;
+          });
+
+          if (ui.filterRackLine !== "ALL" && parts.line !== ui.filterRackLine) return;
+          if (ui.filterShelfLevel !== "ALL" && parts.level !== ui.filterShelfLevel) return;
+          if (ui.filterStatus === "EMPTY" && isOcc) return;
+          if (ui.filterStatus === "OCCUPIED" && !isOcc) return;
+          if (ui.filterStatus === "EXPIRING" && !hasExpWarn && !hasExpired) return;
+          if (ui.filterStatus === "MATCH" && !isMatch) return;
+
+          if (!grouped.has(parts.line)) grouped.set(parts.line, new Map());
+          const lvlMap = grouped.get(parts.line);
+          if (!lvlMap.has(parts.level)) lvlMap.set(parts.level, []);
+          lvlMap.get(parts.level).push({ code, isOcc, isMatch, lots, hasExpWarn, hasExpired });
+        });
+
+        if (grouped.size === 0) {
+          container.innerHTML = `<div class="empty-state">No rack locations match the selected filter criteria.</div>`;
+          return;
+        }
+
+        const sectionHtml = [];
+        grouped.forEach((lvlMap, lineKey) => {
+          const lineLabel = lineKey === "OTHER" ? "Additional / Custom Locations" : `Rack Line ${lineKey}`;
+          let totalInSection = 0;
+          let occInSection = 0;
+          lvlMap.forEach(arr => {
+            totalInSection += arr.length;
+            arr.forEach(x => { if (x.isOcc) occInSection++; });
+          });
+
+          const levelRowsHtml = [];
+          lvlMap.forEach((tiles, lvlKey) => {
+            const tagLabel = lvlKey === "OTHER" ? "CUSTOM" : `LVL ${lvlKey}`;
+            const tilesHtml = tiles.map(t => {
+              const cls = ["rack-tile"];
+              if (t.isOcc) cls.push("occupied");
+              if (t.hasExpWarn) cls.push("exp-warn");
+              if (t.hasExpired) cls.push("expired");
+              if (t.isMatch) cls.push("match");
+              if (ui.selectedRackCode === t.code) cls.push("selected");
+
+              let chemLine = "";
+              let qtyPkgLine = "Empty";
+
+              if (t.lots.length === 1) {
+                const l = t.lots[0];
+                chemLine = l.chemName;
+                qtyPkgLine = l.pkgCount > 0 ? `${formatQty(l.qty)} ${l.unit} • ${l.pkgCount} ${l.pkgType}` : `${formatQty(l.qty)} ${l.unit}`;
+              } else if (t.lots.length > 1) {
+                chemLine = `${t.lots.length} Chemicals/Lots`;
+                const totPkg = t.lots.reduce((a, b) => a + Number(b.pkgCount || 0), 0);
+                qtyPkgLine = totPkg > 0 ? `${totPkg} Pkgs total` : `${t.lots.length} batches`;
+              }
+
+              const tip = t.lots.length
+                ? `${t.code}: ` + t.lots.map(l => `${l.chemName} (Lot: ${l.lotNo || "-"}) — ${formatQtyWithPkg(l.qty, l.unit, l.pkgCount, l.pkgType)}`).join(" | ")
+                : `${t.code}: Empty`;
+
+              return `
+                <div class="${cls.join(" ")}" data-rack-code="${escapeHtml(t.code)}" title="${escapeHtml(tip)}">
+                  <div class="rack-tile-code">${escapeHtml(t.code)}</div>
+                  ${chemLine ? `<div class="rack-tile-chem">${escapeHtml(chemLine)}</div>` : ""}
+                  <div class="rack-tile-meta">${escapeHtml(qtyPkgLine)}</div>
+                </div>
+              `;
+            }).join("");
+
+            levelRowsHtml.push(`
+              <div class="rack-level-row">
+                <div class="rack-level-tag">${escapeHtml(tagLabel)}</div>
+                <div class="rack-bay-grid">${tilesHtml}</div>
+              </div>
+            `);
+          });
+
+          sectionHtml.push(`
+            <div class="rack-line-section">
+              <div class="rack-line-header">
+                <span class="rack-line-title">${escapeHtml(lineLabel)}</span>
+                <span style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">
+                  Occupied: <strong style="color:#2563eb;">${occInSection}</strong> / ${totalInSection}
+                </span>
+              </div>
+              ${levelRowsHtml.join("")}
+            </div>
+          `);
+        });
+
+        container.innerHTML = sectionHtml.join("");
+      }
+
+      function renderInspector() {
+        const code = ui.selectedRackCode;
+        const lots = getLotsInRack(code);
+        const parts = parseRackParts(code);
+
+        document.getElementById("inspRackTitle").textContent = code;
+        document.getElementById("inspRenameInput").value = code;
+        document.getElementById("inspRackSubMeta").textContent = parts.line !== "OTHER"
+          ? `Rack Line ${parts.line}  •  Shelf Level ${parts.level}  •  Bay ${parts.bay}`
+          : "Custom Warehouse Location";
+
+        const badge = document.getElementById("inspRackBadge");
+        if (lots.length > 0) {
+          badge.className = "badge badge-occupied";
+          badge.textContent = `OCCUPIED (${lots.length})`;
+        } else {
+          badge.className = "badge badge-empty";
+          badge.textContent = "EMPTY";
+        }
+
+        const container = document.getElementById("inspLotsContainer");
+        if (lots.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state" style="padding:22px 10px;">
+              <div style="font-weight:700; color:var(--text-main); margin-bottom:4px;">Location ${escapeHtml(code)} is Empty</div>
+              <p style="font-size:12px; margin-bottom:12px;">Click "+ Add Stock Here" to store chemicals with Lot, MFG, EXP, Packaging &amp; Invoice details.</p>
+              <button type="button" class="btn btn-primary btn-sm" id="btnInspEmptyQuickAdd">+ Add Stock Into ${escapeHtml(code)}</button>
+            </div>
+          `;
+          const b = document.getElementById("btnInspEmptyQuickAdd");
+          if (b) b.addEventListener("click", openDirectAddModal);
+          return;
+        }
+
+        container.innerHTML = lots.map(lot => {
+          const expInfo = getExpiryInfo(lot.expDate);
+          const qtyPkgDisplay = lot.pkgCount > 0 ? `${formatQty(lot.qty)} ${lot.unit} by ${lot.pkgCount} ${lot.pkgType}` : `${formatQty(lot.qty)} ${lot.unit}`;
+
+          return `
+            <div class="inspector-lot-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                <div style="font-weight:800; color:var(--text-main); font-size:13.5px;">${escapeHtml(lot.chemName)}</div>
+                ${expInfo.badgeHtml}
+              </div>
+
+              <div class="mono" style="margin-top:6px; font-weight:800; color:#1d4ed8; background:#dbeafe; border:1px solid #93c5fd; padding:4px 9px; border-radius:6px; font-size:12px;">
+                ${escapeHtml(qtyPkgDisplay)}
+              </div>
+
+              <div style="font-size:11.5px; color:var(--text-muted); display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:8px;">
+                <div>Lot No: <strong class="mono" style="color:var(--text-main);">${escapeHtml(lot.lotNo || "-")}</strong></div>
+                <div>GRN No: <strong class="mono" style="color:var(--text-main);">${escapeHtml(lot.grnNo || "DIRECT")}</strong></div>
+                <div>MFG: <strong style="color:var(--text-main);">${escapeHtml(formatDisplayDate(lot.mfgDate))}</strong></div>
+                <div>EXP: <strong style="color:${expInfo.status === "EXPIRED" ? "#be123c" : expInfo.status === "WARN" ? "#b45309" : "var(--text-main)"};">${escapeHtml(formatDisplayDate(lot.expDate))}</strong></div>
+                <div>Invoice: <strong class="mono" style="color:var(--text-main);">${escapeHtml(lot.invoiceNo || "-")}</strong></div>
+                <div>Pack List: <strong class="mono" style="color:var(--text-main);">${escapeHtml(lot.packingListNo || "-")}</strong></div>
+              </div>
+
+              <div style="display:flex; gap:6px; margin-top:10px; padding-top:8px; border-top:1px dashed var(--border);">
+                <button type="button" class="btn btn-secondary btn-sm" style="flex:1;" data-insp-move="${lot.id}">⇄ Transfer</button>
+                <button type="button" class="btn btn-danger btn-sm" style="flex:1;" data-insp-load="${lot.id}">↑ Dispatch</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        container.querySelectorAll("[data-insp-move]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const lotId = btn.getAttribute("data-insp-move");
+            switchTab("putaway");
+            populatePutawaySources();
+            document.getElementById("paSourceSelect").value = code;
+            ui.paSelectedLotId = lotId;
+            renderPutawaySourceLots();
+          });
+        });
+
+        container.querySelectorAll("[data-insp-load]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const lotId = btn.getAttribute("data-insp-load");
+            const lot = state.inventory.find(i => i.id === lotId);
+            if (!lot) return;
+            switchTab("loading");
+            populateLoadingChemDropdown();
+            document.getElementById("gdnChemSelect").value = `${lot.chemName}||${lot.unit}`;
+            renderLoadingFifoTable();
+          });
+        });
+      }
+
+      function saveInlineRackRename() {
+        const oldCode = ui.selectedRackCode;
+        const newCode = document.getElementById("inspRenameInput").value.trim().toUpperCase();
+        if (!newCode) {
+          showToast("Rack location code cannot be empty.", "warning");
+          return;
+        }
+        if (newCode === oldCode) return;
+
+        if (state.racks.some(r => r.toUpperCase() === newCode)) {
+          showToast(`Rack location "${newCode}" already exists.`, "warning");
+          return;
+        }
+
+        const idx = state.racks.indexOf(oldCode);
+        if (idx !== -1) state.racks[idx] = newCode;
+        state.inventory.forEach(item => {
+          if (item.rackCode === oldCode) item.rackCode = newCode;
+        });
+        ui.selectedRackCode = newCode;
+
+        persistState();
+        refreshAllViews();
+        showToast(`Renamed rack location ${oldCode} ➔ ${newCode}`, "success");
+      }
+
+      /* ----------------------------------------------------------------------
+         DIRECT RACK QUICK-ADD MODAL
+         ---------------------------------------------------------------------- */
+      function openDirectAddModal() {
+        const code = ui.selectedRackCode;
+        document.getElementById("daRackCodeLabel").textContent = code;
+        document.getElementById("daChemNameInput").value = "";
+        document.getElementById("daLotInput").value = "";
+        document.getElementById("daMfgInput").value = "";
+        document.getElementById("daExpInput").value = "";
+        document.getElementById("daQtyInput").value = "";
+        document.getElementById("daUnitSelect").value = "KGS";
+        document.getElementById("daPkgCountInput").value = "";
+        document.getElementById("daPkgTypeSelect").value = "Drums";
+        document.getElementById("daInvoiceInput").value = "";
+        document.getElementById("daPackingListInput").value = "";
+        document.getElementById("daVendorInput").value = "";
+        updatePkgBreakdownPill("daQtyInput", "daPkgCountInput", "daUnitSelect", "daPkgTypeSelect", "daPkgCalcPreview");
+
+        document.getElementById("directAddModalBackdrop").classList.add("open");
+        setTimeout(() => document.getElementById("daChemNameInput").focus(), 40);
+      }
+
+      function closeDirectAddModal() {
+        document.getElementById("directAddModalBackdrop").classList.remove("open");
+      }
+
+      function commitDirectAdd(alsoGenerateGrn) {
+        const rackCode = ui.selectedRackCode;
+        const chemName = document.getElementById("daChemNameInput").value.trim().toUpperCase();
+        const lotNo = document.getElementById("daLotInput").value.trim() || "-";
+        const mfgDate = document.getElementById("daMfgInput").value || "-";
+        const expDate = document.getElementById("daExpInput").value || "-";
+        const qty = parseFloat(document.getElementById("daQtyInput").value);
+        const unit = document.getElementById("daUnitSelect").value;
+        const pkgCount = parseInt(document.getElementById("daPkgCountInput").value, 10) || 0;
+        const pkgType = document.getElementById("daPkgTypeSelect").value;
+        const invoiceNo = document.getElementById("daInvoiceInput").value.trim() || "-";
+        const packingListNo = document.getElementById("daPackingListInput").value.trim() || "-";
+        const vendor = document.getElementById("daVendorInput").value.trim() || "-";
+
+        if (!chemName) {
+          showToast("Please enter the Chemical Name.", "warning");
+          document.getElementById("daChemNameInput").focus();
+          return;
+        }
+        if (Number.isNaN(qty) || qty <= 0) {
+          showToast("Please enter a valid Quantity greater than 0.", "warning");
+          document.getElementById("daQtyInput").focus();
+          return;
+        }
+
+        const date = todayISO();
+        const nowIso = new Date().toISOString();
+        const grnNo = alsoGenerateGrn ? formatDocNo("GRN", state.counters.nextGrnSeq) : "DIRECT";
+
+        state.inventory.push({
+          id: generateId("INV"),
+          rackCode,
+          chemName,
+          lotNo,
+          mfgDate,
+          expDate,
+          qty,
+          unit,
+          pkgCount,
+          pkgType,
+          invoiceNo,
+          packingListNo,
+          grnNo,
+          vehicleNo: "-",
+          vendor,
+          storedDate: date,
+          createdAt: Date.now()
+        });
+
+        state.transactions.unshift({
+          id: generateId("TXN"),
+          timestamp: nowIso,
+          date,
+          type: alsoGenerateGrn ? "INBOUND" : "DIRECT-ADD",
+          chemName,
+          lotNo,
+          mfgDate,
+          expDate,
+          qty,
+          unit,
+          pkgCount,
+          pkgType,
+          invoiceNo,
